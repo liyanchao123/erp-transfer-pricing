@@ -1,0 +1,7 @@
+# Normalise line endings: repository stores LF, Windows checkouts stay usable.
+* text=auto eol=lf
+
+# Keep these binary / generated files untouched.
+*.png binary
+*.jpg binary
+*.db binary
