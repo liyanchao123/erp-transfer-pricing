@@ -1,0 +1,17 @@
+# demo database is generated on the fly
+demo.db
+*.db
+*.sqlite
+*.sqlite3
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
