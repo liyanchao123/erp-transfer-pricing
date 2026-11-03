@@ -1,5 +1,9 @@
 # ERP Transfer Pricing — turning four business formulas into auditable SQL
 
+[![demo](https://github.com/liyanchao123/erp-transfer-pricing/actions/workflows/demo.yml/badge.svg)](https://github.com/liyanchao123/erp-transfer-pricing/actions/workflows/demo.yml)
+[![python](https://img.shields.io/badge/python-3.9%20%7C%203.12-blue)](https://www.python.org/)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 A worked example of computing **internal settlement prices** (transfer pricing between
 production, planning and sales centres) directly from an ERP database — including the
 part nobody writes about: how the queries were made to reconcile with finance, and how
@@ -10,12 +14,17 @@ three wrong assumptions in the data model were found and fixed.
 > the data does not.
 
 ```bash
-python scripts/run_demo.py
+python scripts/run_demo.py          # build the demo DB and print every result set
+python scripts/run_demo.py --check  # assert the expected figures, exit 1 on mismatch
 ```
 
 No dependencies beyond the Python standard library. The script builds an in-memory
 SQLite database from `sql/01_schema.sql` + `sql/02_seed.sql`, runs every query in
 `sql/03_queries.sql` and `sql/04_validation.sql`, and prints the result sets.
+
+`--check` re-runs the same pipeline as ten assertions — the four formulas, the
+no-silent-zero-row join, `qty × unit_price = amount`, and the transfer volume that
+formula 3 must skip. CI runs it on every push, on Python 3.9 and 3.12.
 
 ---
 
@@ -78,7 +87,8 @@ instead of six blind edits.
 | 4 · stocktake | 9,700.176 kg loss, 24.5 kg gain (display only) | **97,001.76 / 227.90** |
 
 Every amount above is cross-checked two ways: against the document's own line amount
-(`qty × unit_price`), and against the month's total reported by the ERP UI.
+(`qty × unit_price`), and against the month's total reported by the ERP UI. The figures
+are pinned by `scripts/run_demo.py --check` (10/10 assertions) and run on every push.
 
 ## Repository layout
 
@@ -87,7 +97,8 @@ sql/01_schema.sql        tables, with the naming traps annotated in comments
 sql/02_seed.sql          synthetic September documents (sales, receipts, issues, counts)
 sql/03_queries.sql       the four formulas
 sql/04_validation.sql    layer diagnosis, amount reconciliation, department distribution
-scripts/run_demo.py      builds demo.db and prints every result set
+scripts/run_demo.py      builds demo.db, prints result sets, and asserts the figures
+.github/workflows/       CI: runs the demo and the assertions on Python 3.9 / 3.12
 docs/data-model.md       field-level map: API name → physical column → what it actually means
 docs/decisions.md        the rule decisions and who made them
 ```
